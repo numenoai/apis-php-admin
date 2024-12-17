@@ -1,9 +1,22 @@
-# OpenAPIClient-php
+# NumenoAPI-php
 
-### Admin API
+## Introduction
 
-These are the admin APIs, not meant to be used by anyone but Numeno
-administration tools or the backend of the Numeno dashboard.
+Use the Numeno Administration API to create API Keys and set their permissions (which we call Scopes). This API is meant to be used by administrators of your organization.
+
+## Scopes
+
+Scopes are used to let API Keys access only certain parts of the API.
+
+Scopes are expressed as a string of the form `api:resource:action`.
+
+For example, from the Numeno Article Recommender API (`art-rec`):
+
+- `art-rec:feeds:read` - can read any Feed (eg. `GET` `/feeds`, `/feeds/:id`, `/feeds/:id/streams`, etc.)
+- `art-rec:feeds:write` - can write (and read) any Feed
+- `art-rec:feeds:*` - can perform any action on Feeds
+- `art-rec:*:read` - can read any resource on `art-rec`
+- `*:*:*` - can do everything
 
 For more information, please visit [https://numeno.ai/](https://numeno.ai/).
 
@@ -12,7 +25,6 @@ For more information, please visit [https://numeno.ai/](https://numeno.ai/).
 ### Requirements
 
 PHP 7.4 and later.
-Should also work with PHP 8.0.
 
 ### Composer
 
@@ -20,28 +32,14 @@ To install the bindings via [Composer](https://getcomposer.org/), add the follow
 
 ```json
 {
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/GIT_USER_ID/GIT_REPO_ID.git"
-    }
-  ],
+  "minimum-stability": "dev",
   "require": {
-    "GIT_USER_ID/GIT_REPO_ID": "*@dev"
+    "numeno/api-admin": "dev-main"
   }
 }
 ```
 
 Then run `composer install`
-
-### Manual Installation
-
-Download the files and include `autoload.php`:
-
-```php
-<?php
-require_once('/path/to/OpenAPIClient-php/vendor/autoload.php');
-```
 
 ## Getting Started
 
@@ -54,9 +52,9 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 
 // Configure API key authorization: ApiKeyAuth
-$config = NumenoAdmin\Configuration::getDefaultConfiguration()->setApiKey('X-Numeno-Admin-Key', 'YOUR_API_KEY');
+$config = NumenoAdmin\Configuration::getDefaultConfiguration()->setApiKey('X-Numeno-Key', 'YOUR_API_KEY');
 // Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-// $config = NumenoAdmin\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-Numeno-Admin-Key', 'Bearer');
+// $config = NumenoAdmin\Configuration::getDefaultConfiguration()->setApiKeyPrefix('X-Numeno-Key', 'Bearer');
 
 
 $apiInstance = new NumenoAdmin\Api\DefaultApi(
@@ -65,13 +63,13 @@ $apiInstance = new NumenoAdmin\Api\DefaultApi(
     new GuzzleHttp\Client(),
     $config
 );
-$user_new = new \NumenoAdmin\Model\UserNew(); // \NumenoAdmin\Model\UserNew
+$key_new = new \NumenoAdmin\Model\KeyNew(); // \NumenoAdmin\Model\KeyNew
 
 try {
-    $result = $apiInstance->createUser($user_new);
+    $result = $apiInstance->createKey($key_new);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling DefaultApi->createUser: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling DefaultApi->createKey: ', $e->getMessage(), PHP_EOL;
 }
 
 ```
@@ -80,19 +78,15 @@ try {
 
 All URIs are relative to *https://api.numeno.ai/admin*
 
-| Class        | Method                                                    | HTTP request                     | Description                         |
-| ------------ | --------------------------------------------------------- | -------------------------------- | ----------------------------------- |
-| _DefaultApi_ | [**createUser**](docs/Api/DefaultApi.md#createuser)       | **POST** /v1/users               | Create a new user                   |
-| _DefaultApi_ | [**createUserKey**](docs/Api/DefaultApi.md#createuserkey) | **POST** /v1/keys                | Create a new key for a user         |
-| _DefaultApi_ | [**deleteUser**](docs/Api/DefaultApi.md#deleteuser)       | **DELETE** /v1/users/{idOrWebId} | Delete a user                       |
-| _DefaultApi_ | [**deleteUserKey**](docs/Api/DefaultApi.md#deleteuserkey) | **DELETE** /v1/keys/{key}        | Delete a key                        |
-| _DefaultApi_ | [**getKey**](docs/Api/DefaultApi.md#getkey)               | **GET** /v1/keys/{key}           | Get information about a key         |
-| _DefaultApi_ | [**getKeys**](docs/Api/DefaultApi.md#getkeys)             | **GET** /v1/keys                 | Get all keys, optionally for a user |
-| _DefaultApi_ | [**getUser**](docs/Api/DefaultApi.md#getuser)             | **GET** /v1/users/{idOrWebId}    | Get information about a user        |
-| _DefaultApi_ | [**getUsers**](docs/Api/DefaultApi.md#getusers)           | **GET** /v1/users                | Get all users                       |
-| _DefaultApi_ | [**healthCheck**](docs/Api/DefaultApi.md#healthcheck)     | **GET** /health                  | Check the health of the API         |
-| _DefaultApi_ | [**updateUser**](docs/Api/DefaultApi.md#updateuser)       | **PUT** /v1/users/{idOrWebId}    | Update a user                       |
-| _DefaultApi_ | [**updateUserKey**](docs/Api/DefaultApi.md#updateuserkey) | **PUT** /v1/keys/{key}           | Update a key                        |
+| Class        | Method                                                | HTTP request              | Description                                  |
+| ------------ | ----------------------------------------------------- | ------------------------- | -------------------------------------------- |
+| _DefaultApi_ | [**createKey**](docs/Api/DefaultApi.md#createkey)     | **POST** /v1/keys         | Create a new Key for your organization       |
+| _DefaultApi_ | [**deleteKey**](docs/Api/DefaultApi.md#deletekey)     | **DELETE** /v1/keys/{key} | Delete a Key                                 |
+| _DefaultApi_ | [**getKey**](docs/Api/DefaultApi.md#getkey)           | **GET** /v1/keys/{key}    | Get detailed info about a Key                |
+| _DefaultApi_ | [**getKeys**](docs/Api/DefaultApi.md#getkeys)         | **GET** /v1/keys          | Get a list of all Keys for your organization |
+| _DefaultApi_ | [**getScopes**](docs/Api/DefaultApi.md#getscopes)     | **GET** /v1/scopes        | Get the Scopes for this API                  |
+| _DefaultApi_ | [**healthCheck**](docs/Api/DefaultApi.md#healthcheck) | **GET** /health           | Check the health of the API                  |
+| _DefaultApi_ | [**updateKey**](docs/Api/DefaultApi.md#updatekey)     | **PUT** /v1/keys/{key}    | Update a Key                                 |
 
 ## Models
 
@@ -101,13 +95,10 @@ All URIs are relative to *https://api.numeno.ai/admin*
 - [HealthCheck](docs/Model/HealthCheck.md)
 - [KeyInfo](docs/Model/KeyInfo.md)
 - [KeyInfoFull](docs/Model/KeyInfoFull.md)
+- [KeyInfoList](docs/Model/KeyInfoList.md)
 - [KeyNew](docs/Model/KeyNew.md)
 - [KeyUpdate](docs/Model/KeyUpdate.md)
-- [Keys](docs/Model/Keys.md)
-- [UserInfo](docs/Model/UserInfo.md)
-- [UserNew](docs/Model/UserNew.md)
-- [UserUpdate](docs/Model/UserUpdate.md)
-- [Users](docs/Model/Users.md)
+- [Scopes](docs/Model/Scopes.md)
 
 ## Authorization
 
@@ -116,17 +107,8 @@ Authentication schemes defined for the API:
 ### ApiKeyAuth
 
 - **Type**: API key
-- **API key parameter name**: X-Numeno-Admin-Key
+- **API key parameter name**: X-Numeno-Key
 - **Location**: HTTP header
-
-## Tests
-
-To run the tests, use:
-
-```bash
-composer install
-vendor/bin/phpunit
-```
 
 ## Author
 
@@ -137,6 +119,6 @@ support@numeno.ai
 This PHP package is automatically generated by the [OpenAPI Generator](https://openapi-generator.tech) project:
 
 - API version: `1.0.0`
-  - Package version: `0.0.2`
-  - Generator version: `7.9.0`
+  - Package version: `0.0.4`
+  - Generator version: `7.10.0`
 - Build package: `org.openapitools.codegen.languages.PhpClientCodegen`
